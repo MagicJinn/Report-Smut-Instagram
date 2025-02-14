@@ -1,5 +1,5 @@
 let alreadyFoundVideos = [];
-const CLICK_DELAY = 800; // ms
+const CLICK_DELAY = 500; // ms
 const GAUS_DEVIA = 100 // ms
 
 // Function to generate a random Gaussian number
@@ -21,43 +21,68 @@ function logAndClick(element, description) {
     }
 }
 
-// Function to perform the reporting sequence
-function performReportSequence() {
-    const reportButton = Array.from(document.querySelectorAll('button'))
-        .find(button => button.textContent.trim() === "Report");
+// Individual click functions with retry logic
+function clickReportButton(onSuccess, attempts = 0, maxAttempts = 50000) {
+    setTimeout(() => {
+        const reportButton = Array.from(document.querySelectorAll('button'))
+            .find(button => button.textContent.trim() === "Report");
 
-    if (reportButton) {
-        const delay1 = randomGaussian(CLICK_DELAY, GAUS_DEVIA);
-        setTimeout(() => {
+        if (reportButton) {
             logAndClick(reportButton, 'Report button');
+            onSuccess();
+        } else if (attempts < maxAttempts) {
+            console.log(`Retry attempt ${attempts + 1} for report button`);
+            setTimeout(() => clickReportButton(onSuccess, attempts + 1), randomGaussian(CLICK_DELAY, GAUS_DEVIA));
+        } else {
+            console.log('Max attempts reached for report button');
+        }
+    }, randomGaussian(CLICK_DELAY, GAUS_DEVIA));
+}
 
-            const delayBeforeNudityOption = randomGaussian(CLICK_DELAY, GAUS_DEVIA);
-            setTimeout(() => {
-                const nudityOption = Array.from(document.querySelectorAll('div'))
-                    .find(option => option.textContent.trim().includes("Nudity or sexual activity"));
+function clickNudityOption(onSuccess, attempts = 0, maxAttempts = 50000) {
+    setTimeout(() => {
+        const nudityOption = Array.from(document.querySelectorAll('button'))
+            .find(option => option.textContent.trim().includes("Nudity or sexual activity"));
 
-                if (nudityOption) {
-                    const delay2 = randomGaussian(CLICK_DELAY, GAUS_DEVIA);
-                    setTimeout(() => {
-                        logAndClick(nudityOption, 'Nudity option');
+        if (nudityOption) {
+            logAndClick(nudityOption, 'Nudity option');
+            onSuccess();
+        } else if (attempts < maxAttempts) {
+            console.log(`Retry attempt ${attempts + 1} for nudity option`);
+            setTimeout(() => clickNudityOption(onSuccess, attempts + 1), randomGaussian(CLICK_DELAY, GAUS_DEVIA));
+        } else {
+            console.log('Max attempts reached for nudity option');
+        }
+    }, randomGaussian(CLICK_DELAY, GAUS_DEVIA));
+}
 
-                        const delay3 = randomGaussian(CLICK_DELAY, GAUS_DEVIA);
-                        setTimeout(() => {
-                            const targetButton = Array.from(document.querySelectorAll('button'))
-                                .find(button => button.textContent.includes("Nudity or sexual activity"));
+function clickFinalButton(attempts = 0, maxAttempts = 50000) {
+    setTimeout(() => {
+        const targetButton = Array.from(document.querySelectorAll('button'))
+            .find(button => button.textContent.includes("Nudity or sexual activity"));
 
-                            logAndClick(targetButton, 'Specified button');
-                        }, delay3);
+        if (targetButton) {
+            logAndClick(targetButton, 'Specified button');
+        } else if (attempts < maxAttempts) {
+            console.log(`Retry attempt ${attempts + 1} for final button`);
+            setTimeout(() => clickFinalButton(attempts + 1), randomGaussian(CLICK_DELAY, GAUS_DEVIA));
+        } else {
+            console.log('Max attempts reached for final button');
+        }
+    }, randomGaussian(CLICK_DELAY, GAUS_DEVIA));
+}
 
-                    }, delay2);
-                } else {
-                    console.log('Nudity option not found.');
-                }
-            }, delayBeforeNudityOption);
-        }, delay1);
-    } else {
-        console.log('Report button not found.');
-    }
+// Main reporting sequence function
+function performReportSequence() {
+    clickReportButton(() => {
+        setTimeout(() => {
+            clickNudityOption(() => {
+                setTimeout(() => {
+                    clickFinalButton();
+                }, randomGaussian(CLICK_DELAY, GAUS_DEVIA));
+            });
+        }, randomGaussian(CLICK_DELAY, GAUS_DEVIA));
+    });
 }
 
 // Function to check for video elements and log their lengths
