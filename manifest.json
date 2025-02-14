@@ -1,0 +1,15 @@
+{
+  "name": "Report-Smut-Instagram",
+  "version": "0.0.1",
+  "manifest_version": 3,
+  "description": "Report-Smut-Instagram",
+  "content_scripts": [
+    {
+      "matches": [ "*://*.instagram.com/*" ],
+      "js": [ "RSI_ReportScript.js" ]
+    }
+  ],
+  "action": { "default_popup": "default_popup.html" },
+  "background": { "scripts": [ "RSI_Background.js" ] },
+  "permissions": [ "activeTab" ]
+}
