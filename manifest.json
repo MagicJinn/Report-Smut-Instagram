@@ -1,16 +1,23 @@
 {
   "name": "Report-Smut-Instagram",
   "version": "0.0.1",
-  "manifest_version": 3,
+  "manifest_version": 2,
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "report-smut-instagram@MagicJinn.com"
+    }
+  },
   "description": "Report-Smut-Instagram",
   "content_scripts": [
     {
       "matches": [ "*://*.instagram.com/*" ],
-      "js": [ "RSI_ReportScript.js" ]
+      "js": [ "RSI_ReportScript.js" ],
+      "run_at": "document_end"
     }
   ],
-  "action": { "default_popup": "default_popup.html" },
+  "browser_action": { "default_popup": "default_popup.html" },
   "permissions": [
-    "storage"
+    "storage",
+    "*://*.instagram.com/*"
   ]
 }
