@@ -1,14 +1,20 @@
 // Configuration
 const CONFIG = {
     DELAY: {
-        BASE_MS: 500,
-        VARIANCE_MS: 100
+        BASE_MS: 350,
+        VARIANCE_MS: 50
     },
     MAX_RETRIES: 50000
 };
 
 // State management
 const processedVideos = new Set();
+
+// Check enabled state before processing
+async function isEnabled() {
+    const result = await chrome.storage.sync.get({ enabled: true });
+    return result.enabled;
+}
 
 // Utility functions
 function generateDelay() {
@@ -91,7 +97,9 @@ const ReportActions = {
 
 // Video processing
 const VideoProcessor = {
-    handleLongVideo: (video) => {
+    handleLongVideo: async (video) => {
+        if (!(await isEnabled())) return;
+
         const moreOptionsButton = document.querySelector('svg[aria-label="More options"]')
             ?.closest('div[role="button"]');
 
@@ -106,8 +114,9 @@ const VideoProcessor = {
         }, generateDelay());
     },
 
-    process: (video) => {
+    process: async (video) => {
         if (processedVideos.has(video)) return;
+        if (!(await isEnabled())) return;
 
         const handleMetadata = () => {
             console.log(`Found video: ${video.duration} seconds`);
@@ -122,7 +131,8 @@ const VideoProcessor = {
         if (video.src) handleMetadata();
     },
 
-    scan: () => {
+    scan: async () => {
+        if (!(await isEnabled())) return;
         document.querySelectorAll('video').forEach(VideoProcessor.process);
     }
 };
